@@ -103,6 +103,41 @@ que `05_consumer_store.py` sans interférer avec lui — bon moment pour
 montrer le découplage apporté par le broker : plusieurs consommateurs,
 plusieurs usages, une seule source de données.
 
+Voici le diagramme permettant de visualiser le pipeline :
+```mermaid
+flowchart LR
+    subgraph Source["Source"]
+        WM[("Wikimedia EventStreams<br/>flux SSE 'recentchange'<br/>filtré sur frwiki")]
+    end
+
+    subgraph Ingestion["Ingestion"]
+        P["04_producer_kafka.py<br/>Producteur Kafka"]
+    end
+
+    subgraph Broker["Broker de messages — Redpanda (compatible Kafka)"]
+        T[("Topic wiki-edits<br/>partitionné par clé = wiki")]
+        Console["Redpanda Console<br/>UI web : localhost:8080"]
+    end
+
+    subgraph Consumers["Consommateurs indépendants (groupes distincts)"]
+        C1["05_consumer_store.py<br/>groupe: store-group"]
+        C2["dashboard/app.py<br/>groupe: dashboard-group"]
+        C3["06_consumer_lag_demo.py<br/>groupe: lag-demo-group"]
+    end
+
+    DB[("SQLite<br/>data/wiki_edits.db")]
+    UI["Navigateur<br/>Dashboard Streamlit<br/>localhost:8501"]
+
+    WM -- "push continu (SSE)" --> P
+    P -- "producer.send(key, value)" --> T
+    T -. "métriques / inspection" .-> Console
+    T -- "poll()" --> C1
+    T -- "poll()" --> C2
+    T -- "poll()" --> C3
+    C1 -- "INSERT" --> DB
+    C2 -- "rendu temps réel" --> UI
+```
+
 ### Étape 6 : Pour aller plus loin, panne, lag, backpressure
 ```bash
 python scripts/06_consumer_lag_demo.py --sleep 2
