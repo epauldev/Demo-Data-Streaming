@@ -1,0 +1,51 @@
+# --- Environnement virtuel Python ---
+venv/
+.venv/
+env/
+
+# --- Fichiers compilés / caches Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Données générées par la démo ---
+# La base SQLite est créée par 05_consumer_store.py : elle ne se versionne pas.
+data/*
+!data/.gitkeep
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Streamlit ---
+# Garder .streamlit/config.toml si vous en créez un, ignorer les secrets.
+.streamlit/secrets.toml
+
+# --- Secrets et configuration locale ---
+.env
+.env.*
+!.env.example
+
+# --- macOS ---
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# --- OneDrive / synchronisation ---
+desktop.ini
+*.tmp
+~$*
+
+# --- Editeurs / IDE ---
+.vscode/
+.idea/
+*.swp
+
+# --- Archives et livrables générés ---
+*.zip
+
+# --- Logs ---
+*.log
